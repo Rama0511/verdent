@@ -87,15 +87,26 @@ class PredictionController extends Controller
             }
 
             // Build full URL for result image from FastAPI
+            // Convert FastAPI path to proper HTTPS URL without port
             $resultImageUrl = null;
             
             if (isset($resp['result']['output_path'])) {
+                // Extract just the path part (e.g., "static/outputs/result_xxx.jpg")
+                $outputPath = $resp['result']['output_path'];
+                
+                // Remove any leading slash or protocol if present
+                $outputPath = preg_replace('#^(https?://[^/]+)?/?#', '', $outputPath);
+                
+                // Build proper URL: https://agroparkpkklampung.my.id/api/static/outputs/...
                 $parsed = parse_url($modelApi);
-                $origin = ($parsed['scheme'] ?? 'https') . '://' . ($parsed['host'] ?? '');
-                if (isset($parsed['port'])) {
-                    $origin .= ':' . $parsed['port'];
+                $origin = ($parsed['scheme'] ?? 'https') . '://' . ($parsed['host'] ?? 'agroparkpkklampung.my.id');
+                
+                // If outputPath starts with "static/", prepend "/api/"
+                if (strpos($outputPath, 'static/') === 0) {
+                    $resultImageUrl = $origin . '/api/' . $outputPath;
+                } else {
+                    $resultImageUrl = $origin . '/' . ltrim($outputPath, '/');
                 }
-                $resultImageUrl = rtrim($origin, '/') . '/' . ltrim($resp['result']['output_path'], '/');
             }
 
             $d = Detection::create([
