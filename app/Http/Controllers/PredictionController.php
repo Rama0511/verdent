@@ -27,7 +27,7 @@ class PredictionController extends Controller
         $originalImagePath = $path ? ('/storage/' . $path) : null;
 
         try {
-            $modelApi = env('MODEL_API_URL', 'https://agroparkpkklampung.my.id/predict/');
+            $modelApi = env('MODEL_API_URL', 'https://agroparkpkklampung.my.id/api/predict/');
 
             $response = Http::withOptions(['verify' => true, 'timeout' => 30])
                 ->accept('application/json')

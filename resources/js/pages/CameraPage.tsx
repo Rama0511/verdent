@@ -53,10 +53,13 @@ export default function CameraPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Gagal mengirim gambar ke server');
+        const errorText = await response.text();
+        console.error('Server response:', response.status, errorText);
+        throw new Error('Gagal mengirim gambar ke server: ' + response.status);
       }
 
       const data = await response.json();
+      console.log('Prediction response:', data);
 
       // Normalize and store for ResultPage
       const toStore = {
